@@ -1,0 +1,33 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>Popup Plugin Example</title>
+    <meta charset="utf-8">
+    
+    <link rel="stylesheet" href="style.css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    
+    <script src="../libs/jquery/jquery.js"></script>
+    <script src="../src/jquery.popup.js"></script>
+    
+    <script>
+      $( function() {
+        $( '#example-popup' ).popup();
+        $( '#show-button' ).click( function() {
+          $( '#example-popup' ).popup( 'show' );
+        });
+      });
+    </script>
+    
+  </head>
+  <body>
+    
+    <button id="show-button">Show Popup</button>
+    
+    <div id="example-popup">
+      <h2>Popup Window</h2>
+      <p>This is a popup window. The popup:open event has been triggered.</p>
+    </div>
+    
+  </body>
+</html>
