@@ -8,68 +8,87 @@
 
 ( function($) {
 
-  $.fn.popup = function () {
+  $.fn.popup = function ( options ) {
+    
+    if ( typeof options === 'string' ) {
+      this.data( 'popup' ).methods[ options ]();
+      return this;
+    }
+    
     var defaults = {
       className: 'b-popup'
     };
     return this.each( function() {
-      var self = this,
+      var popup = {},
+          self = this,
           $this = $( self );
       
-      function createPopupWindow() {
-        var $popup = $( '<div class="' + defaults.className + '">' +
-          '<div class="' + defaults.className + '__close"></div>' +
-          '<div class="' + defaults.className + '__content"></div>' +
-          '</div>' );
+      $this.data( 'popup', popup );
+      
+      popup.methods = {
+      
+        createPopupWindow: function() {
+          var $popup = $( '<div class="' + defaults.className + '">' +
+            '<div class="' + defaults.className + '__close">Close</div>' +
+            '<div class="' + defaults.className + '__content"></div>' +
+            '</div>' );
+            
+          $popup.find( '.' + defaults.className + '__content' ).append( $this );
+          $( 'body' ).append( $popup );
           
-        $popup.find( '.' + defaults.className + '__content' ).html( $this.html() );
-        $( 'body' ).append( $popup );
+          popup.$popup = $popup;
+          popup.$closeButton = $popup.find( '.b-popup__close' );
+        },
         
-        self.$popup = $popup;
-        self.$closeButton = $popup.find( '.b-popup__close' );
-      }
-      
-      function createOpaco() {
-        var $opaco = $( '<div class="' + defaults.className + '-opaco"></div>' );
-        self.$popup.before( $opaco );
+        createOpaco: function() {
+          var $opaco = $( '<div class="' + defaults.className + '-opaco"></div>' );
+          popup.$popup.before( $opaco );
+          
+          popup.$opaco = $opaco;
+        },
         
-        self.$opaco = $opaco;
-      }
-      
-      function handleEvents() {
-        self.$opaco.click( clickOpaco );
-        self.$closeButton.click( clickClose );
-        $( document ).on( 'popup:keyup', keyupDocument );
-        $( document ).bind( 'keyup', function( event ) {
-          $( document ).trigger( 'popup:keyup', [ event ] );
-        });
+        show: function() {
+          $( 'body' ).addClass( 'i-popup-active' );
+        },
         
-      }
-      
-      function close() {
-        self.$popup.remove();
-        self.$opaco.remove();
-      }
-      
-      function clickOpaco(e) {
-        e.preventDefault();
-        close();
-      }
-      
-      function clickClose(e) {
-        e.preventDefault();
-        close();
-      }
-      
-      function keyupDocument( e, event ) {
-        if ( event.keyCode === 27 ) {
+        close: function() {
+          $( 'body' ).removeClass( 'i-popup-active' );
+          console.info( 'close' );
+        },
+        
+        clickOpaco: function(e) {
+          e.preventDefault();
           close();
+          console.info( 'clickOpaco' );
+        },
+        
+        clickClose: function(e) {
+          e.preventDefault();
+          close();
+          console.info( 'clickClose' );
+        },
+        
+        keyupDocument: function( e, event ) {
+          if ( event.keyCode === 27 ) {
+            close();
+          }
+          console.info( 'keyupDocument' );
         }
-      }
+      };
       
-      createPopupWindow();
-      createOpaco();
-      handleEvents();
+      popup.methods.createPopupWindow();
+      popup.methods.createOpaco();
+      
+      //handle events
+      
+      popup.$opaco.click( popup.methods.clickOpaco );
+      popup.$closeButton.click( popup.methods.clickClose );
+      
+      $( document ).on( 'popup:keyup', popup.methods.keyupDocument );
+      
+      $( document ).bind( 'keyup', function( event ) {
+        $( document ).trigger( 'popup:keyup', [ event ] );
+      });
       
     });
   };
